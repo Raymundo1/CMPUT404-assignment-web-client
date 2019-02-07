@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 # Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
+# Modified work Copyright 2019 Xinlei Chen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +24,8 @@ import socket
 import re
 # you may use urllib to encode data appropriately
 from urllib.parse import urlparse
+
+DEFAULT_HTTP_PORT = 80
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -69,7 +72,7 @@ class HTTPClient(object):
     def seperate_netloc(self, netloc):
         result = netloc.split(":")
         if(len(result) == 1):
-            return (result[0], 80) # default port 80
+            return (result[0], DEFAULT_HTTP_PORT)
         else:
             return (result[0], int(result[1]))
 
@@ -83,16 +86,11 @@ class HTTPClient(object):
             raise ValueError("the host is not a standard http server")
 
     def get_headers(self, data):
-        # https://stackoverflow.com/questions/10380992/get-python-dictionary-from-string-containing-key-value-pairs
-        # regex = re.compile(r"\b(\w+)\s*:\s*([^:]*)(?=\s+\w+\s*:|$)")
         
         headers = {}
         raw_headers = data.split("\r\n\r\n")[0].split("\r\n")[1:]
         for item in raw_headers:
             try:
-                # this may need be change
-                # print(item)
-                # key, value = item.split(": ", 1)
                 key, value = item.split(":", 1)
                 key = key.strip()
                 value = value.strip()
@@ -134,11 +132,14 @@ class HTTPClient(object):
         hostname, port = self.seperate_netloc(url_encode.netloc)
 
         # connect to server
-        # https://www.geeksforgeeks.org/socket-programming-python/
+        # URL: https://www.geeksforgeeks.org/socket-programming-python/
+        # AUTHOR: Kishlay Verma
+        # AUTHOR URL: https://www.linkedin.com/in/kishlayverma/
         host_ip = socket.gethostbyname(hostname)
 
-        # url: https://stackoverflow.com/questions/25447803/python-socket-connection-exception
-        # author: mhawke
+        # URL: https://stackoverflow.com/questions/25447803/python-socket-connection-exception
+        # AUTHOR: mhawke
+        # AUTHOR URL: https://stackoverflow.com/users/21945/mhawke
         try:
             self.connect(host_ip, port)
         except socket.error as exc:
@@ -193,11 +194,14 @@ class HTTPClient(object):
         hostname, port = self.seperate_netloc(url_encode.netloc)
 
         # connect to server
-        # https://www.geeksforgeeks.org/socket-programming-python/
+        # URL: https://www.geeksforgeeks.org/socket-programming-python/
+        # AUTHOR: Kishlay Verma
+        # AUTHOR URL: https://www.linkedin.com/in/kishlayverma/
         host_ip = socket.gethostbyname(hostname)
 
-        # url: https://stackoverflow.com/questions/25447803/python-socket-connection-exception
-        # author: mhawke
+        # URL: https://stackoverflow.com/questions/25447803/python-socket-connection-exception
+        # AUTHOR: mhawke
+        # AUTHOR URL: https://stackoverflow.com/users/21945/mhawke
         try:
             self.connect(host_ip, port)
         except socket.error as exc:
@@ -245,7 +249,6 @@ class HTTPClient(object):
         respond_headers = self.get_headers(data)
         # print(respond_headers)
         print(body)
-
 
         return HTTPResponse(code, body)
 
